@@ -19,9 +19,10 @@ def go(args):
     run.config.update(args)
 
     artifact_local_path = run.use_artifact(args.input_artifact).file()
-    logger.info(f"Artifact {args.input_artifact} downloaded to {artifact_local_path}")
+    logger.info(
+        f"Artifact {args.input_artifact} downloaded to {artifact_local_path}")
 
-    df= pd.read_csv(artifact_local_path)
+    df = pd.read_csv(artifact_local_path)
     logger.info(f"Dataset loaded - shape: {df.shape}")
 
     # drop duplicated rows
@@ -31,7 +32,7 @@ def go(args):
         logger.info(f"Removed {n_duplicates} duplicated rows")
     else:
         logger.info("No duplicated rows found")
-    
+
     # fix price range - drop outliers
     idx = df['price'].between(args.min_price, args.max_price)
     df = df[idx].copy()
@@ -40,22 +41,21 @@ def go(args):
         logger.info(f"Removed {n_outliers} outliers from price column")
     else:
         logger.info("No outliers found in price column")
-    
 
     # drop outliers in minimum nights
     idx_nights = df['minimum_nights'].between(args.min_nights, args.max_nights)
     df = df[idx_nights].copy()
     n_outliers_nights = ~idx.sum()
     if n_outliers_nights > 0:
-        logger.info(f"Removed {n_outliers_nights} outliers from minimum nights column")
+        logger.info(
+            f"Removed {n_outliers_nights} outliers from minimum nights column")
     else:
         logger.info("No outliers found in minimum nights column")
-    
 
     artifact = wandb.Artifact(
-        name= args.output_artifact,
-        type= args.output_type,
-        description= args.output_description
+        name=args.output_artifact,
+        type=args.output_type,
+        description=args.output_description
     )
 
     df.to_csv(args.output_artifact, index=False)
@@ -69,68 +69,65 @@ def go(args):
     os.remove(args.output_artifact)
 
 
-
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Data cleaning")
 
-
     parser.add_argument(
-        "--input_artifact", 
+        "--input_artifact",
         type=str,
         help="The name of the input artifact to be cleaned",
         required=True
     )
 
     parser.add_argument(
-        "--output_artifact", 
+        "--output_artifact",
         type=str,
         help="The name of the output artifact to be created",
         required=True
     )
 
     parser.add_argument(
-        "--output_type", 
+        "--output_type",
         type=str,
         help="The type of the output artifact to be created",
         required=True
     )
 
     parser.add_argument(
-        "--output_description", 
+        "--output_description",
         type=str,
         help="The description of the output artifact to be created",
         required=True
     )
 
     parser.add_argument(
-        "--min_price", 
+        "--min_price",
         type=int,
         help="Minimum price to filter the dataset",
         required=True
     )
 
     parser.add_argument(
-        "--max_price", 
+        "--max_price",
         type=int,
         help="Maximum price to filter the dataset",
         required=True
     )
 
     parser.add_argument(
-        "--min_nights", 
+        "--min_nights",
         type=int,
         help="Minimum nights to filter the dataset",
         required=True
     )
 
     parser.add_argument(
-        "--max_nights", 
+        "--max_nights",
         type=int,
         help="Maximum nights to filter the dataset",
         required=True
     )
-
 
     args = parser.parse_args()
 
