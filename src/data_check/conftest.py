@@ -1,6 +1,18 @@
 import pytest
 import pandas as pd
 import wandb
+import yaml
+
+
+# Load config file
+with open("../../config.yaml", "r") as f:
+    config = yaml.safe_load(f)
+
+# start wandb run
+run = wandb.init(
+    project=config["main"]["project_name"],
+    group=config["main"]["experiment_name"],
+    job_type='data_check')
 
 
 def pytest_addoption(parser):
@@ -9,6 +21,8 @@ def pytest_addoption(parser):
     parser.addoption("--kl_threshold", action="store")
     parser.addoption("--min_price", action="store")
     parser.addoption("--max_price", action="store")
+    parser.addoption("--min_nights", action="store")
+    parser.addoption("--max_nights", action="store")
 
 
 @pytest.fixture(scope='session')
@@ -71,3 +85,23 @@ def max_price(request):
         pytest.fail("You must provide max_price")
 
     return float(max_price)
+
+
+@pytest.fixture(scope='session')
+def min_nights(request):
+    min_nights = request.config.option.min_nights
+
+    if min_nights is None:
+        pytest.fail("You must provide min_nights")
+
+    return float(min_nights)
+
+
+@pytest.fixture(scope='session')
+def max_nights(request):
+    max_nights = request.config.option.max_nights
+
+    if max_nights is None:
+        pytest.fail("You must provide max_nights")
+
+    return float(max_nights)
