@@ -52,6 +52,12 @@ def go(args):
     else:
         logger.info("No outliers found in minimum nights column")
 
+    # property boundaries
+    idx = df['longitude'].between(-74.25, -
+                                  73.50) & df['latitude'].between(40.5, 41.2)
+    df = df[idx].copy()
+    logger.info("Fixed lat/lon boundaries fro properties")
+
     artifact = wandb.Artifact(
         name=args.output_artifact,
         type=args.output_type,
