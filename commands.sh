@@ -17,6 +17,8 @@ mlflow run src/eda
 # clean data
 mlflow run . -P steps="basic_cleaning"
 
+# mlflow run https://github.com/mintzaspan/build-ml-pipeline-for-short-term-rental-prices.git -P steps="basic_cleaning"
+
 # data checks
 mlflow run . -P steps="data_check"
 
